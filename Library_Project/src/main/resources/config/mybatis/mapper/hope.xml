@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="hope">
+
+	<!-- HopeController============================================= -->
+	<!-- 1.희망도서  ==========================================-->
+	<!-- 희망도서 신청 -->
+	<insert id="hope_insert" parameterType="hope">
+		insert into hope values(
+		hope_idx.nextval,
+		#{m_id},
+		#{subject},
+		#{author},
+		#{company},
+		#{book_year},
+		#{isbn},
+		SYSDATE,
+		0
+		)
+	</insert>
+	
+	<!-- 2.아이디별 희망도서 신청내역 확인  ==========================================-->
+	<!-- 페이지별 게시물 조회 -->
+	<select id="hope_list_condition" parameterType="java.util.HashMap" resultType="hope">
+	select * from (select rank() over(order by idx desc) no, b.*
+            from (select * from hope) b) where no between #{start} and #{end} and m_id = #{m_id}
+	</select>
+	<!-- 전체 게시물 수 구하기 -->
+	<select id="hope_count" resultType="int" parameterType="java.util.HashMap">
+		select count(*) from hope where m_id = #{m_id}
+	</select>
+	<!-- 희망도서 취소(유저) -->
+	<update id="hope_update" parameterType="int">
+		update hope set result = 3 where idx = #{idx}
+	</update>
+	
+	<!-- 3.그밖의  ==========================================-->
+	<!-- 전체 게시물 조회 -->
+	<select id="hope_list" resultType="hope">
+		select * from hope order by result asc
+	</select>
+	
+	<!-- HopeController============================================= -->
+
+	<!-- LibraryController(관리자 같이사용)============================================= -->
+	<!-- 전체 게시물 조회 -->
+	<select id="hope_one" resultType="hope" parameterType="int">
+		select * from hope where idx = #{idx}
+	</select>
+	<!-- 희망도서 승인 -->
+	<update id="allow_hope_update" parameterType="int">
+		update hope set result = 2 where idx = #{idx}
+	</update>
+	<!-- 희망도서 거절 -->
+	<update id="reject_hope_update" parameterType="int">
+		update hope set result = 1 where idx = #{idx}
+	</update>
+		
+</mapper>

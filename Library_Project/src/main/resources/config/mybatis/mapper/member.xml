@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="member">
+	
+	<!-- LibraryController(본페이지)============================================= -->
+	<!-- 0.공통사항  ==========================================-->
+	<!-- 인증완료후 아이디 찾기(아이디찾기, 개인정보 변경, 회원 탈퇴) -->
+	<select id="member_search_idx" resultType="member" parameterType="int">
+		select * from member where m_idx=#{m_idx}
+	</select>
+	<!-- 선택 유저 정보 삭제(회원 탈퇴(본페이지), 회원관리(관리자)) -->
+	<update id="admin_user_del" parameterType="int">
+		update member set regi=1 where m_idx=#{m_idx}
+	</update>
+	<!-- 개인정보 변경(비밀번호x)(내서재(본페이지), 유저관리(관리자)) -->
+	<update id="member_update_user_nopwd" parameterType="member">
+		update member set 
+			email=#{email},
+			tel=#{tel},
+			gen=#{gen},
+			postcode=#{postcode},
+			addr=#{addr},
+			extraaddr=#{extraaddr}
+			where m_idx=#{m_idx}
+	</update>
+	<!-- 개인정보 변경(비밀번호o)(내서재(본페이지), 유저관리(관리자)) -->
+	<update id="member_update_user_yespwd" parameterType="member">
+		update member set 
+			pwd=#{pwd},
+			email=#{email},
+			tel=#{tel},
+			gen=#{gen},
+			postcode=#{postcode},
+			addr=#{addr},
+			extraaddr=#{extraaddr}
+			where m_idx=#{m_idx}
+	</update>
+	
+	<!-- 2.로그인(본페이지)  ==========================================-->
+	<!-- 아이디 중복 -->
+	<select id="member_id_check" resultType="member" parameterType="java.lang.String">
+		select * from member where id=#{id}
+	</select>
+	
+	<!-- 3.회원가입(본페이지)  ==========================================-->
+	<!-- 회원가입 -->
+	<insert id="member_insert" parameterType="member">
+		insert into member values(
+			seq_member_idx.nextval,
+			#{id},
+			#{pwd},
+			#{name},
+			#{tel},
+			#{gen},
+			#{postcode},
+			#{addr},
+			#{extraaddr},
+			#{email},
+			sysdate,
+			'0'
+		)
+	</insert>
+	
+	<!-- 4.회원가입(본페이지)  ==========================================-->
+	<!-- 아이디 찾기 -->
+	<select id="member_search_id" parameterType="member" resultType="member">
+		select * from member where name=#{name} and email=#{email} and regi=0
+	</select>
+	<!-- 비밀번호 찾기 -->
+	<select id="member_search_pwd" parameterType="member" resultType="member">
+		select * from member where id=#{id} and email=#{email} and regi=0
+	</select>
+	<!-- 비밀번호 변경 -->
+	<update id="member_update_pwd" parameterType="member">
+		update member set pwd=#{pwd} where m_idx=#{m_idx}
+	</update>
+	
+	<!-- 5.내서재(본페이지)  ==========================================-->
+	<!-- 대출이력 조회 -->
+	<select id="user_lent_search" parameterType="String" resultType="lent">
+		select * from lent where m_id=#{m_id}
+	</select>
+	<!-- 대출이력 조회 취소버튼 -->
+	<update id="user_lent_ccr" parameterType="int">
+		update lent set lent='ccr' where idx=#{idx}
+	</update>
+	<!-- LibraryController(본페이지)============================================= -->
+	
+	
+	<!-- LibraryController(관리자)============================================= -->
+	<!-- 관리자 -->
+	<!--  2.책(관리자)  ========================================== -->
+	<!-- 책의 모든정보 -->
+	<select id="admin_book_list" resultType="search">
+		select * from off_book order by idx DESC
+	</select>
+	<!-- 대여 반납 관리 정보 가져오기 -->
+	<select id="admin_lent_list" resultType="lent">
+		select * from lent order by idx DESC
+	</select>
+	
+	<!--  3.유저(관리자)  ========================================== -->
+	<!-- 모든 유저의 정보 -->
+	<select id="admin_user_list" resultType="member">
+		select * from member where m_idx > 0
+	</select>
+	<!-- 유저 복구처리 -->
+	<update id="admin_user_restore" parameterType="int">
+		update member set regi=0 where m_idx=#{m_idx}
+	</update>
+	
+	<!--  4.열린마당(관리자)  ========================================== -->
+	<!-- 자유게시판 정보 가져오기 **************************************************-->
+	<select id="admin_board_qa_list" resultType="board">
+		select * from lib_board where step=0 order by idx DESC
+	</select>
+	<!-- 선택 자유게시판 정보 가져오기 -->
+	<select id="admin_board_selectone" parameterType="int" resultType="board">
+		select * from lib_board where idx=#{idx}
+	</select>
+	<!-- 선택 자유게시판 정보 삭제 -->
+	<update id="admin_board_del" parameterType="int">
+		update lib_board set del_info='1' where idx=#{idx}
+	</update>
+	<!-- 선택 자유게시판정보 복구(삭제한것 복구 처리) -->
+	<update id="admin_board_restore" parameterType="int">
+		update lib_board set del_info='0' where idx=#{idx}
+	</update>
+	
+	<!-- 공지사항 정보 가져오기 ************************************************-->
+	<select id="admin_gongji_list" resultType="gongji">
+		select * from gongji order by idx DESC
+	</select>
+	<!-- 선택 공지사항 삭제 -->
+	<update id="admin_gongji_del" parameterType="int">
+		update gongji set del_info='-1' where idx=#{idx}
+	</update>
+	<!-- 공지사항 선택글 복구 -->
+	<update id="admin_gongji_restore" parameterType="int">
+		update gongji set del_info='0' where idx=#{idx}
+	</update>
+	<!-- 공지사항 선택글 공지글로 변경 -->
+	<update id="admin_gongji_main" parameterType="int">
+		update gongji set del_info='1' where idx=#{idx}
+	</update>
+	<!-- 해당 게시글의 댓글 가져오기 -->
+	<select id="admin_board_com_list" parameterType="board" resultType="board">
+		select * from lib_board, member where ref=#{ref} and step > 0 and mem_id = id and regi = '0' ORDER BY idx DESC
+	</select>
+	
+	<!-- LibraryController(관리자)============================================= -->
+	
+</mapper>

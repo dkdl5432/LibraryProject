@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="s">
+
+	<!-- <select id="visit_list" resultType="visit">
+		select * from visit order by idx desc
+	</select> -->
+	
+	<select id="checkT1" resultType="seat" parameterType="int">
+		select * from seats where t1_mem_idx=#{idx}
+	</select>
+	
+	<select id="checkT2" resultType="seat" parameterType="int">
+		select * from seats where t2_mem_idx=#{idx}
+	</select>
+	
+	<select id="checkT3" resultType="seat" parameterType="int">
+		select * from seats where t3_mem_idx=#{idx}
+	</select>
+	
+	<select id="selectMult" resultType="seat">
+		select * from seats where seat_idx>=1 and 24>=seat_idx
+	</select>
+	
+	<select id="selectRead" resultType="seat">
+		select * from seats where seat_idx>=25 and 66>=seat_idx
+	</select>
+	
+	<select id="selectOne"	resultType="seat">
+		select * from seats where seat_idx=#{seat_idx}
+	</select>
+	
+	<update id="book1" parameterType="seat" >
+		update seats set t1_mem_idx=#{t1_mem_idx}where seat_idx=#{seat_idx}
+	</update>
+	
+	<update id="book2" parameterType="seat" >
+		update seats set  t2_mem_idx=#{t2_mem_idx} where seat_idx=#{seat_idx}
+	</update>
+	
+	<update id="book3" parameterType="seat" >
+		update seats set t3_mem_idx=#{t3_mem_idx} where seat_idx=#{seat_idx}
+	</update>
+	
+	<select id="count1" parameterType="int" resultType="int">
+		select count(*) from seats where t1_mem_idx=#{m_idx}
+	</select>
+	
+	<select id="count2" parameterType="int" resultType="int">
+		select count(*) from seats where t2_mem_idx=#{m_idx}
+	</select>
+	
+	<select id="count3" parameterType="int" resultType="int">
+		select count(*) from seats where t3_mem_idx=#{m_idx}
+	</select>
+	
+	<update id="initialize">
+		update seats set t1_mem_idx=-1, t2_mem_idx=-1, t3_mem_idx=-1
+	</update>
+	
+	<select id="selectList" resultType="seat">
+		select * from seats
+	</select>
+	
+	<update id="del_my_t1" parameterType="int">
+		update seats set t1_mem_idx=-1 where t1_mem_idx=#{m_idx}
+	</update>
+	
+	<update id="del_my_t2" parameterType="int">
+		update seats set t2_mem_idx=-1 where t2_mem_idx=#{m_idx}
+	</update>
+	
+	<update id="del_my_t3" parameterType="int">
+		update seats set t3_mem_idx=-1 where t3_mem_idx=#{m_idx}
+	</update>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+

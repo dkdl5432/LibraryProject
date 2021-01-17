@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
+	
+	<!-- 재봉 -->
+ 	<bean id="resolce_daoBean" class="dao.ResolceDAO"> 
+		<property name="sqlSession" ref="sqlSessionBean"/>
+	</bean>
+	
+	<!-- 상현 -->
+	<bean id = "gongji_daoBean" class = "dao.GongjiDAO">
+		<property name = "sqlSession" ref = "sqlSessionBean"/>
+	</bean>
+	
+	<!-- 정인 -->
+	<bean id="seat_daoBean" class="dao.SeatDAO">
+		<property name="sqlSession" ref="sqlSessionBean"/>
+	</bean>
+	
+	<!-- 민재 -->
+	<bean id="board_daoBean" class="dao.BoardDAO">
+		<property name="sqlSession" ref="sqlSessionBean" />
+	</bean>
+	<bean id="hope_daoBean" class="dao.HopeDAO">
+		<property name="sqlSession" ref="sqlSessionBean" />
+	</bean>
+		
+</beans>

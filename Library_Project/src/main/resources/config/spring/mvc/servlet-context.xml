@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/mvc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- DispatcherServlet Context: defines this servlet's request-processing infrastructure -->
+	
+	<!-- Enables the Spring MVC @Controller programming model -->
+	<annotation-driven />
+
+	<!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources in the ${webappRoot}/resources directory -->
+	<resources mapping="/resources/**" location="/resources/" />
+
+	<!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
+	<!-- <beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<beans:property name="prefix" value="/WEB-INF/views/" />
+		<beans:property name="suffix" value=".jsp" />
+	</beans:bean> -->
+	
+	<!-- 지정한 패키지의 Component자식들을 순차적으로 자동생성(Auto-Detecting)한다!! -->
+	<!-- <context:component-scan base-package="dao, controller" /> -->
+	
+	<!-- Autowired 사용 가능 -->
+	<context:annotation-config/>
+	  
+	<!-- 수동으로 컨트롤러 생성 -->
+	<!-- 정호  -->
+	<beans:bean id="member_dao_con" class="dao.MemberDAO">
+	</beans:bean>
+	<beans:bean id="member_service_con" class="service.MemberService"> 
+	</beans:bean>
+	<beans:bean id="member_con" class="com.korea.lib.LibraryController">
+		<beans:property name="resolceDAO" ref="resolce_daoBean"/>
+		<beans:property name="board_dao" ref="board_daoBean" />
+	</beans:bean>
+	
+	<!-- 재봉 -->
+	<beans:bean id="search_con" class="com.korea.lib.SearchController">
+		<beans:property name="resolceDAO" ref="resolce_daoBean"/>
+	</beans:bean>
+	
+	<!-- 상현 -->
+	<beans:bean class = "com.korea.lib.GongjiController">
+		<beans:property name = "gongji_dao" ref = "gongji_daoBean"/>
+	</beans:bean>
+	
+	<!-- 정인 -->
+	<beans:bean id="seat_con" class="com.korea.lib.SeatController">
+ 		<beans:property name="seat_dao" ref="seat_daoBean" /> 
+  	</beans:bean>
+  	
+  	<!-- 민재 -->
+  	<beans:bean class="com.korea.lib.BoardController">
+		<beans:property name="board_dao" ref="board_daoBean" />
+	</beans:bean>
+	<beans:bean class="com.korea.lib.HopeController">
+		<beans:property name="hope_dao" ref="hope_daoBean" />
+	</beans:bean>
+	
+</beans:beans>

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="board">
+	<!-- 전체 게시물 조회 -->
+	<select id="board_list" resultType="board">
+		SELECT * FROM lib_BOARD  where del_info = '0' ORDER BY idx DESC
+	</select>
+	
+	<!-- 새 글 쓰기(댓글 아님) -->
+	<insert id="board_insert" parameterType="board">
+		INSERT INTO lib_BOARD VALUES(
+		lib_BOARD_IDX.NEXTVAL,
+		#{subject},
+		#{name},
+		#{content},
+		SYSDATE,
+		'0',
+		lib_BOARD_IDX.CURRVAL,
+		'0',
+		'0',
+		#{mem_id},
+		#{ip}
+		)	
+	</insert>
+	
+	<!-- 페이지 별 게시물 조회 -->
+	<select id="board_list_condition" parameterType="java.util.HashMap"
+				 resultType="board">
+		SELECT * FROM (SELECT RANK() OVER(ORDER BY idx DESC) no, B.*
+	    		 FROM (SELECT * FROM lib_board where del_info = '0' and step = '0') b) WHERE no BETWEEN 1 AND 5		 
+		<!-- SELECT * FROM (SELECT RANK() OVER(ORDER BY idx DESC) no, B.*
+	    		 FROM (SELECT * FROM lib_board where del_info = '0' and step = '0') b)
+					where mem_id = (select id from member m where regi = 0) and no BETWEEN #{start} AND #{end} -->
+	</select>
+	
+	<!-- 전체 게시물 수 조회 -->
+	<select id="board_count" resultType="int">
+		SELECT COUNT(*) FROM lib_BOARD where del_info = '0' 
+	</select>
+	
+	<!-- idx에 해당되는 게시물 한 건 조회하기 -->
+	<select id="board_one" resultType="board" parameterType="int">
+		SELECT * FROM lib_BOARD WHERE IDX = #{idx}	
+	</select>
+	
+	<!-- 게시글 삭제 처리 --> 
+	<update id="del_update" parameterType="int">
+		UPDATE lib_BOARD set
+		DEL_INFO  = '1'
+		WHERE IDX = #{idx}
+	</update>
+	
+	<!-- 조회수 증가 -->
+	<update id="board_update_readhit" parameterType="int">
+		UPDATE lib_BOARD SET READHIT = READHIT + 1 WHERE IDX = #{idx}	
+	</update>
+	
+	<!-- 새 글 쓰기(댓글 아님) -->
+	<insert id="board_comment" parameterType="board">
+		INSERT INTO lib_BOARD VALUES(
+		lib_BOARD_IDX.NEXTVAL,
+		#{subject},
+		#{name},
+		#{content},
+		SYSDATE,
+		'0',
+		#{ref},
+		#{step},
+		'0',
+		#{mem_id},
+		#{ip}
+		)	
+	</insert>
+	
+	<!-- 해당 게시글의 댓글 가져오기 -->
+	<select id="board_comment_list" parameterType="board" resultType="board">
+		select * from lib_board, member where ref=#{ref} and del_info = '0' and step > 0 and mem_id = id and regi = '0' ORDER BY idx DESC
+	</select>
+	
+	<!-- 해당 게시글의 수정 -->
+	<update id="board_modify" parameterType="board">
+		update lib_board set 
+			subject=#{subject}, 
+			content=#{content},
+			regdate=sysdate,
+			ip=#{ip} where idx=#{idx}
+	</update>
+	
+	<!-- 기준글의 step보다 큰 step들을 1씩 증가 -->
+	<update id="board_update_step" parameterType="board">
+		update lib_board set
+		step = step+1
+		where ref=#{ref} and step > #{step}
+	</update>
+	
+	<!-- 페이징 글 가져오기(5개) -->
+	<select id="board_com_list_map" parameterType="java.util.HashMap"
+			resultType="board">
+		SELECT * FROM (SELECT RANK() OVER(ORDER BY idx DESC) no, B.*
+    		  FROM (select * from lib_board where ref=1 and del_info = '0' and step > 0) b) WHERE no BETWEEN #{start} AND #{end}
+    	<!-- SELECT * FROM (SELECT RANK() OVER(ORDER BY idx DESC) no, B.*
+    	 	FROM (select * from lib_board where ref=1 and del_info = '0' and step > 0) b)
+			where mem_id = (select id from member m where regi = 0) and no BETWEEN #{start} AND #{end} -->	  
+	</select>
+	<!-- 댓글의 총갯수 -->
+	<select id="board_com_list_total" parameterType="int" resultType="int">
+		SELECT COUNT(*) FROM lib_BOARD where del_info = '0'and ref=#{ref} and step > 0
+	</select>
+	
+ </mapper>

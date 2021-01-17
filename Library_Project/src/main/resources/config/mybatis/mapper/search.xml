@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="search">
+	
+	<!-- SearchController============================================= -->
+	<!-- 0.공통사항  ==========================================-->
+	<!-- 책정보 상세보기(책정보상세보기, 예약)  -->
+	<select id="select_one" resultType="search" parameterType="String">
+		select * from off_book where isbl like '%'||#{isbl}||'%'
+	</select>
+	
+	<!-- 1.자료검색  ==========================================-->
+	<!-- 전체검색 -->
+	<select id="select" resultType="search">
+		select * from off_book order by book_name
+	</select>
+	
+	<!-- 2.컬럼별 내용검색  ==========================================-->
+	<!-- 책이름 -->
+	<select id="select_bName" resultType="search" parameterType="String">
+		select * from off_book where book_name like '%'||#{search}||'%'
+	</select>
+	<!-- 카테고리 -->
+	<select id="select_category" resultType="search" parameterType="String">
+		select * from off_book where category='%'||#{search}||'%'
+	</select>
+	<!-- 회사 -->
+	<select id="select_company" resultType="search" parameterType="String">
+		select * from off_book where company='%'||#{search}||'%'
+	</select>
+	<!-- 책번호 -->
+	<select id="select_isbl" resultType="search" parameterType="String">
+		select * from off_book where isbl like '%'||#{search}||'%'
+	</select>
+	<!-- 연도 -->
+	<select id="select_bYear" resultType="search" parameterType="String">
+		select * from off_book where book_year='%'||#{search}||'%'
+	</select>
+	
+	<!-- 3.예약  ==========================================-->
+	<!-- 예약/대영를 위한 회원정보 가져오기 -->
+	<select id="select_m_id" resultType="member" parameterType="String">
+		select * from member where id=#{m_id}
+	</select>
+	<!-- 예약되어있는 책 정보가져오기 -->
+	<select id="reserve_lenttwo" resultType="vo.LentVO" parameterType="vo.LentVO">
+		select * from lent where lent = 'reserve' and b_isbl = #{b_isbl}
+	</select>
+	<!-- 예약정보 insert -->
+	<insert id="insertLent" parameterType="vo.LentVO">
+		insert into lent values(
+			lent_idx.nextVal,
+			#{m_id},
+			#{b_isbl},
+			#{lent},
+			#{lentdate},
+			#{redate},
+			#{b_name}
+		)
+	</insert>
+	
+	<!-- 4.신규책  ==========================================-->
+	<!-- 신규책 추가 -->
+	<insert id="new_book_insert" parameterType="search">
+		insert into off_book values(
+			book_idx.nextVal,
+			#{book_name},
+			#{category},
+			#{company},
+			#{content},
+			#{author},
+			#{book_year},
+			#{isbl},
+			sysdate,
+			0,
+			0,
+			0,
+			0
+		)
+	</insert>
+	<select id="selectTime" resultType="search" parameterType="String">
+		SELECT * FROM off_book WHERE RECEIVING BETWEEN sysdate-7 AND sysdate
+	</select>
+	
+	<!-- 5.이달의 추천도서  ==========================================-->
+	<!-- 회원이 접근하는 이달의 추천책 페이지 -->
+	<select id="recommend_select" resultType="search">
+		select * from off_book where rec = 1
+	</select>
+	
+	<!-- 관리자 페이지  ==========================================-->
+	<!-- 1.책  ==========================================-->
+	<!-- 예약된책 대여로 바꿔주기 -->
+	<update id="lent_update" parameterType="int">
+		UPDATE lent	SET	lent = 'lent' WHERE idx = #{idx}
+	</update>
+	<!-- 대여된책 반납으로 바꿔주기 -->
+	<update id="rt_update" parameterType="int">
+		UPDATE lent	SET	lent = 'rt' WHERE idx = #{idx}
+	</update>
+	<!-- 예약취소해주기 -->
+	<update id="cancelupdate">
+		UPDATE lent set lent = 'cancel' WHERE idx=#{idx}
+	</update>
+	<!-- 이달의 추천책 모든책 가져오기 -->
+	<select id="selectrmd_book" resultType="search" >
+		select * from off_book 
+	</select>
+	<!-- 일반책 추천도서로 전환 -->
+	<update id="rmd_update" parameterType="int">
+		UPDATE off_book set rec = 1 where idx = #{idx}
+	</update>
+	<!-- 추천도서 일반도서로 전환 -->
+	<update id="normal_update" parameterType="int">
+		UPDATE off_book set rec = 0 where idx = #{idx}
+	</update>
+	
+	<!-- SearchController============================================= -->
+	
+	
+	<!-- LibraryController============================================= -->
+	<!-- 1.메인화면(본페이지)  ==========================================-->
+	<!-- 메인화면에 뿌려줄 공지사랑 리스트 가져오기 -->
+	<select id="gongji" resultType="vo.GongjiVO">
+		select * from gongji
+	</select>
+	
+	<!-- 관리자 페이지 -->
+	<!-- 1.메인화면(관리자)  ==========================================-->
+	<!-- 관리자 메인 페이지 예약 신청된책정보 -->
+	<select id="selectLent" resultType="lent">
+		select * from lent where lent = 'reserve'
+	</select>
+	
+	<!-- LibraryController============================================= -->
+</mapper>

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="gongji">
+	
+	<!-- GongjiController============================================= -->
+	<!-- 1.공지사항  ==========================================-->
+	<!-- 페이지별 게시물 조회 -->
+	<select id = "gongji_list_condition" parameterType = "java.util.HashMap" 
+				resultType = "gongji">
+		select * from ( select rank() over(order by idx desc) no,
+		 b.* from ( select * from gongji ) b ) where no between #{start} and #{end}
+	</select>
+	<!-- 전체게시물 조회 -->
+	<select id = "gongji_list" resultType = "gongji">
+		select * from gongji order by idx DESC
+	</select>
+	
+	<!-- 2.상세보기  ==========================================-->
+	<!-- 조회수 증가 -->
+	<update id="gongji_update_readhit" parameterType = "int">
+		update gongji set readhit = readhit + 1 where idx = #{idx}
+	</update>
+	
+	<!-- 5.선택 공지사항 삭제  ==========================================-->
+	<!-- 게시글 삭제 처리 -->
+	<update id = "del_update" parameterType = "gongji">
+		update gongji set
+			title=#{title},
+			name=#{name},
+			del_info = -1
+			where idx=#{idx}
+	</update>
+	
+	<!-- 6.그 밖의-  ==========================================-->
+	<!-- 전체 게시물 수 조회 -->
+	<select id = "gongji_count" resultType = "int">
+		select count(*) from gongji
+	</select>
+	
+	<!-- LibraryController(관리자 같이사용)============================================= -->
+	<!-- 0.공통사항 - 선택 게시물 한 건 조회(상세보기, 공지사항 수정) -->
+	<select id = "gongji_one" parameterType = "int" resultType = "gongji">
+		select * from gongji where idx=#{idx}
+	</select>
+	<!-- 3.공지사항 - 글 수정 -->
+	<update id = "gongji_update" parameterType = "gongji">
+		update gongji set title=#{title}, name=#{name}, content=#{content}, regdate=sysdate where idx=#{idx}
+	</update>
+	<!-- 4.공지사항 글쓰기 - 공지사항 글 작성 -->
+	<insert id="gongji_insert" parameterType = "gongji">
+		insert into gongji values(	
+			seq_gongji_idx.nextVal, 
+			#{title}, 
+			#{name}, 
+			#{content}, 
+			'0',
+			sysdate,
+			'0'
+		)
+	</insert>
+
+	<!-- LibraryController(관리자 같이사용)============================================= -->
+	
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
